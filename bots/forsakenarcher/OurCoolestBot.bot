@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bot
+	name="CoolBot"
+	description="bot_description_forsaken_archer"
+	heroname="Hero_ForsakenArcher"
+	rootlua="coolbot_main.lua"
+	defaultplayername="CoolBot"
+	precachepath="/heroes/forsaken_archer/"
+/>
