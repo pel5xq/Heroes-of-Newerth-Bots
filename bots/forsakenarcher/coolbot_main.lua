@@ -30,14 +30,18 @@ object.eventsLib     = {}
 object.metadata     = {}
 object.behaviorLib     = {}
 object.skills         = {}
+object.state 		 = {}
+object.aggroBehavior = {}
 
 runfile "bots/core.lua"
 runfile "bots/botbraincore.lua"
 runfile "bots/eventsLib.lua"
 runfile "bots/metadata.lua"
 runfile "bots/behaviorLib.lua"
+runfile "bots/forsakenarcher/coolbot_state.lua"
+runfile "bots/forsakenarcher/coolbot_behavior.lua"
 
-local core, eventsLib, behaviorLib, metadata, skills = object.core, object.eventsLib, object.behaviorLib, object.metadata, object.skills
+local core, eventsLib, behaviorLib, metadata, skills, state, aggroBehavior = object.core, object.eventsLib, object.behaviorLib, object.metadata, object.skills, object.state, object.aggroBehavior
 
 local print, ipairs, pairs, string, table, next, type, tinsert, tremove, tsort, format, tostring, tonumber, strfind, strsub
     = _G.print, _G.ipairs, _G.pairs, _G.string, _G.table, _G.next, _G.type, _G.table.insert, _G.table.remove, _G.table.sort, _G.string.format, _G.tostring, _G.tonumber, _G.string.find, _G.string.sub
@@ -147,7 +151,6 @@ end
 -- @return: none
 function object:onthinkOverride(tGameVariables)
     self:onthinkOld(tGameVariables)
-
     -- custom code here
 end
 object.onthinkOld = object.onthink
@@ -163,6 +166,7 @@ object.onthink 	= object.onthinkOverride
 -- @param: eventdata
 -- @return: none
 function object:oncombateventOverride(EventData)
+    state.oncombateventOverride(EventData)
 end
 -- override combat event trigger function.
 object.oncombateventOld = object.oncombatevent
@@ -177,7 +181,7 @@ object.oncombatevent     = object.oncombateventOverride
 -- @param: iunitentity hero
 -- @return: number
 local function CustomHarassUtilityFnOverride(hero)
-    return 0
+    return state.CustomHarassUtilityFnOverride(hero) * aggroBehavior.action()
 end
 -- assisgn custom Harrass function to the behaviourLib object
 behaviorLib.CustomHarassUtility = CustomHarassUtilityFnOverride   
@@ -228,8 +232,19 @@ end
 object.harassExecuteOld = behaviorLib.HarassHeroBehavior["Execute"]
 behaviorLib.HarassHeroBehavior["Execute"] = HarassHeroExecuteOverride
 
+local function PushingStrengthUtilityOverride(myHero)
+        return  object.funcPushUtilityOld(myHero) * state.PushingStrengthUtility(myHero) * aggroBehavior.action()
+end
+object.funcPushUtilityOld = behaviorLib.PushingStrengthUtility
+behaviorLib.PushingStrengthUtility = PushingStrengthUtilityOverride
 
 
-
+function behaviorLib.RetreatFromThreatExecuteOverride(botBrain)
+        if not state.RetreatFromThreatExecuteOverride(botBrain) then
+                behaviorLib.RetreatFromThreatExecuteOld(botBrain)
+        end
+end
+behaviorLib.RetreatFromThreatExecuteOld = behaviorLib.RetreatFromThreatBehavior["Execute"]
+behaviorLib.RetreatFromThreatBehavior["Execute"] = behaviorLib.RetreatFromThreatExecuteOverride
 
 
