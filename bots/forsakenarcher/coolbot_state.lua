@@ -123,7 +123,7 @@ function state.handleStateChange()
    -- missing who could gank, 
    -- switch to laning
    
-   if core.unitSelf ~= nil and core.unitSelf:GetLevel() > 1 then --6
+   if core.unitSelf ~= nil and core.unitSelf:GetLevel() > 6 then
       local flag = false   
       for i,v in pairs(core.localUnits["EnemyHeroes"]) do
          flag = true
