@@ -150,6 +150,7 @@ end
 -- @param: tGameVariables
 -- @return: none
 function object:onthinkOverride(tGameVariables)
+    state.handleStateChange()
     self:onthinkOld(tGameVariables)
     -- custom code here
 end

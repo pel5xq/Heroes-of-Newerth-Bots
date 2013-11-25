@@ -62,14 +62,12 @@ end
 LaningState = createClass(ParentState)
 
 function LaningState:oncombateventOverride(EventData)
-		state.handleStateChange()
 		--retreat if health too low, if outnumbered, retreat
 		--if enemy is disadvantaged, use crippling volley
 		--right on them
 end
 
 function LaningState:CustomHarassUtilityFnOverride(hero)
-		state.handleStateChange()
 		-- attack if enemy is out of position
 		-- and you wouldnt be put out of position by attacking
 		return .5
@@ -88,13 +86,11 @@ end
 LaneFarmingState = createClass(ParentState)
 
 function LaneFarmingState:oncombateventOverride(EventData)
-		state.handleStateChange()
 		--reasses if heroes are attacking you
 		--or if its still safe to farm
 end
 
 function LaneFarmingState:CustomHarassUtilityFnOverride(hero)
-		state.handleStateChange()
 		-- reasses how much you should be farming then
 		return .5
 end
@@ -109,13 +105,38 @@ function LaneFarmingState.RetreatFromThreatExecuteOverride(botBrain)
    return true
 end
 
-local actualstate = LaningState:new{}
+local laningstate = LaningState:new{}
+local lanefarmingstate = LaneFarmingState:new{}
+local actualstate = laningstate
+local lastLaneApp = 0
 
 function state.handleStateChange()
    -- if no enemies are in lane
    -- and there is no apparent danger of heroes coming
-   -- and lvl 7, switch to lane farming
-   -- else switch to laning
+   -- and >= lvl 7, switch to lane farming
+   
+   --Dont go back to farming if saw an enemy as recently
+   --as 30 seconds ago
+   
+   -- if enemies do come into
+   -- the lane or there is a hero
+   -- missing who could gank, 
+   -- switch to laning
+   
+   if core.unitSelf ~= nil and core.unitSelf:GetLevel() > 1 then --6
+      local flag = false   
+      for i,v in pairs(core.localUnits["EnemyHeroes"]) do
+         flag = true
+      end
+      if (flag and actualstate == lanefarmingstate) then 
+         core.AllChat("Switching to Laning", 0)
+         actualstate = laningstate 
+         lastLaneApp = HoN.GetGameTime()
+      elseif ((not flag) and actualstate == laningstate and (lastLaneApp == 0 or (HoN.GetGameTime() - lastLaneApp) > 1000*30)) then 
+         core.AllChat("Switching to Lane Farming", 0) 
+         actualstate = lanefarmingstate
+      end
+   end
    
 end
 
