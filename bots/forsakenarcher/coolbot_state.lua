@@ -105,8 +105,29 @@ end
 LaneFarmingState = createClass(ParentState)
 
 function LaneFarmingState:oncombateventOverride(EventData)
-		--reasses if heroes are attacking you
-		--or if its still safe to farm
+	--Look for opportunity to farm creeps faster
+	--If a clump of them have low health, cast volley on them
+	--If not, attack the high-health ones to farm faster
+	if core.unitSelf ~= nil then
+		local averageCreepPosition
+		local highHealthCreep
+		local tLocalEnemies = core.CopyTable(core.localUnits["EnemyUnits"])
+		local numLowEnough = 0
+		local numTotal = 0
+		local volleyAbility = core.unitSelf:GetAbility(0)
+		for nID, unitEnemy in pairs(tLocalEnemies) do
+		   numTotal = numTotal + 1
+		   if unitEnemy:GetHealth() < .9 * (85 + 65 * volleyAbility:GetLevel()) then 
+		      numLowEnough = numLowEnough + 1 
+		      averageCreepPosition = unitEnemy:GetPosition()
+		   	elseif highHealthCreep ~= nil then highHealthCreep = unitEnemy end
+		end
+		if numLowEnough > 2 and (numLowEnough / numTotal) > .6 and core.unitSelf:GetMana() > volleyAbility:GetManaCost() * 1.9 then 
+		   core.OrderAbilityPosition(object, core.unitSelf:GetAbility(0), averageCreepPosition)
+		elseif highHealthCreep ~= nil then
+		   core.OrderAttackClamp(object, core.unitSelf, highHealthCreep)
+		end
+	end
 end
 
 function LaneFarmingState:CustomHarassUtilityFnOverride(hero)
@@ -132,7 +153,7 @@ local lastLaneApp = 0
 function state.handleStateChange()
    -- if no enemies are in lane
    -- and there is no apparent danger of heroes coming
-   -- and >= lvl 7, switch to lane farming
+   -- and >= lvl 4, switch to lane farming
    
    --Dont go back to farming if saw an enemy as recently
    --as 30 seconds ago
@@ -142,7 +163,7 @@ function state.handleStateChange()
    -- missing who could gank, 
    -- switch to laning
    
-   if core.unitSelf ~= nil and core.unitSelf:GetLevel() > 6 then
+   if core.unitSelf ~= nil and core.unitSelf:GetLevel() > 3 then
       local flag = false   
       for i,v in pairs(core.localUnits["EnemyHeroes"]) do
          flag = true
