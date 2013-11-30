@@ -94,17 +94,6 @@ object.tSkills = {
     4, 4, 4, 4, 4,
 }
 
--- bonus agression points if a skill/item is available for use
-
-
--- bonus agression points that are applied to the bot upon successfully using a skill/item
-
-
---thresholds of aggression the bot must reach to use these abilities
-
-
-
-
 
 --####################################################################
 --####################################################################
@@ -197,41 +186,35 @@ behaviorLib.CustomHarassUtility = CustomHarassUtilityFnOverride
 -- @param botBrain: CBotBrain
 -- @return: none
 --
-local function HarassHeroExecuteOverride(botBrain)
+--local function HarassHeroExecuteOverride(botBrain)
     
-    local unitTarget = behaviorLib.heroTarget
-    if unitTarget == nil then
-        return object.harassExecuteOld(botBrain) --Target is invalid, move on to the next behavior
-    end
-    
-    
-    local unitSelf = core.unitSelf
-    local vecMyPosition = unitSelf:GetPosition() 
-    local nAttackRange = core.GetAbsoluteAttackRangeToUnit(unitSelf, unitTarget)
-    local nMyExtraRange = core.GetExtraRange(unitSelf)
-    
-    local vecTargetPosition = unitTarget:GetPosition()
-    local nTargetExtraRange = core.GetExtraRange(unitTarget)
-    local nTargetDistanceSq = Vector3.Distance2DSq(vecMyPosition, vecTargetPosition)
-    
-    local nLastHarassUtility = behaviorLib.lastHarassUtil
-    local bCanSee = core.CanSeeUnit(botBrain, unitTarget)    
-    local bActionTaken = false
+--    local unitTarget = behaviorLib.heroTarget
+--    if unitTarget == nil then
+--        return object.harassExecuteOld(botBrain) --Target is invalid, move on to the next behavior
+--    end
     
     
-    --- Insert abilities code here, set bActionTaken to true 
-    --- if an ability command has been given successfully
+--    local unitSelf = core.unitSelf
+--    local vecMyPosition = unitSelf:GetPosition() 
+--    local nAttackRange = core.GetAbsoluteAttackRangeToUnit(unitSelf, unitTarget)
+--    local nMyExtraRange = core.GetExtraRange(unitSelf)
     
+--    local vecTargetPosition = unitTarget:GetPosition()
+--    local nTargetExtraRange = core.GetExtraRange(unitTarget)
+--    local nTargetDistanceSq = Vector3.Distance2DSq(vecMyPosition, vecTargetPosition)
     
-    
-    
-    if not bActionTaken then
-        return object.harassExecuteOld(botBrain)
-    end 
-end
+--    local nLastHarassUtility = behaviorLib.lastHarassUtil
+--    local bCanSee = core.CanSeeUnit(botBrain, unitTarget)    
+    --if botBrain == nil then core.AllChat("Null bot brain in main") end
+--    local bActionTaken = state.HarassHeroExecuteOverride(botBrain)
+--   
+--    if not bActionTaken then
+--        return object.harassExecuteOld(botBrain)
+--    end 
+--end
 -- overload the behaviour stock function with custom 
-object.harassExecuteOld = behaviorLib.HarassHeroBehavior["Execute"]
-behaviorLib.HarassHeroBehavior["Execute"] = HarassHeroExecuteOverride
+--object.harassExecuteOld = behaviorLib.HarassHeroBehavior["Execute"]
+--behaviorLib.HarassHeroBehavior["Execute"] = HarassHeroExecuteOverride
 
 local function PushingStrengthUtilityOverride(myHero)
         return  object.funcPushUtilityOld(myHero) * state.PushingStrengthUtility(myHero) * aggroBehavior.action()

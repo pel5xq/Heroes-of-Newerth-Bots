@@ -44,7 +44,6 @@ end
 
 ParentState = {}
 function ParentState:oncombateventOverride(EventData)
-		
 end
 
 function ParentState:CustomHarassUtilityFnOverride(hero)
@@ -62,9 +61,29 @@ end
 LaningState = createClass(ParentState)
 
 function LaningState:oncombateventOverride(EventData)
-		--retreat if health too low, if outnumbered, retreat
-		--if enemy is disadvantaged, use crippling volley
-		--right on them
+	if core.unitSelf ~= nil then
+		local unitToAttack
+		local tLocalEnemies = core.CopyTable(core.localUnits["EnemyHeroes"])
+		
+		for nID, unitEnemy in pairs(tLocalEnemies) do
+		   if (unitEnemy:GetHealth() / unitEnemy:GetMaxHealth()) < .6 then unitToAttack = unitEnemy end
+		end
+		
+		if unitToAttack ~= nil then 
+		  --if already immobilized from crippling volley, use ultimate
+		  if (unitToAttack:IsStunned() or unitToAttack:IsImmobilized()) and core.unitSelf:GetAbility(3):CanActivate() then
+		    --core.AllChat("Ultimate time!")
+		    core.OrderAbilityPosition(object, core.unitSelf:GetAbility(3), unitToAttack:GetPosition())
+		  
+		  --else use crippling volley
+		  elseif core.unitSelf:GetAbility(0):CanActivate() then
+		    --cast it a little ahead of where target is pointing
+		    --if botBrain == nil then core.AllChat("Null bot brain") end
+		    --core.AllChat("Take this!")
+		    core.OrderAbilityPosition(object, core.unitSelf:GetAbility(0), unitToAttack:GetPosition() +  .75 * unitToAttack:GetMoveSpeed() * Vector3.Normalize(unitToAttack.storedPosition - unitToAttack.lastStoredPosition))
+		  end
+		end
+	end
 end
 
 function LaningState:CustomHarassUtilityFnOverride(hero)
