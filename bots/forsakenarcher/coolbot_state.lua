@@ -136,9 +136,47 @@ function LaneFarmingState:CustomHarassUtilityFnOverride(hero)
 end
 
 function LaneFarmingState.PushingStrengthUtility(myHero)
-  --encourage pushing, as long as you arent too weak for tower
-  return .5
+    --encourage pushing, as long as you arent too weak for tower
+	local weight = 0;
+	-- gets game time
+	local gameTime = Hon.GetGameTime()
+	if gameTime > 100000
+		weight = 30
+		end
+
+	elseif
+		-- maybe add a function to attack hero with lowest health?
+		local enemyHeroes = HoN.GetHeroes(enemyTeam)
+		if enemyHeroes = 0
+			weight = 30
+			end
+		end
+
+	elseif
+
+		-- gets how many enemies are active
+		local enemiesActive = behaviorLib.EnemiesPushUtility(core.enemyTeam)
+		-- gets strength of your team
+		local pushUtility = behaviorLib.TeamPushUtility()
+		-- how well your team can push right now
+		local pushingStrUtil = behaviorLib.PushingStrengthUtility(core.unitSelf)
+		--encourage pushing, as long as you arent too weak for tower
+		-- how powerful are you?
+		local heroPower = behaviorLib.DPSPushingUtility
+		enemiesActive = enemiesActive * behaviorLib.enemiesDeadUtilMul
+		pushUtility = pushUtility * behaviorLib.pushingStrUtilMul
+		pushingStrUtil = pushingStrUtil * behaviorLib.nTeamPushUtilityMul
+		-- weight is balance between enemiesactive, how powerful is your team
+		weight = enemiesActive + pushingUtility + pushingStrUtil + heroPower
+		-- makes sure number is is within cap
+		weight = Clamp(utility, 0, behaviorLib.pushingCap)
+		BotEcho("I'm pushing, yo")
+		--any other behavior?
+		end
+	return weight
 end
+
+
 
 function LaneFarmingState.RetreatFromThreatExecuteOverride(botBrain)
    -- If enough danger, use Energizer or Phase Boots to escape
