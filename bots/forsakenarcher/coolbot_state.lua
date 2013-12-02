@@ -139,21 +139,12 @@ function LaneFarmingState.PushingStrengthUtility(myHero)
     --encourage pushing, as long as you arent too weak for tower
 	local weight = 0;
 	-- gets game time
-	local gameTime = Hon.GetGameTime()
-	if gameTime > 100000
+	local gameTime = HoN.GetGameTime()
+	if gameTime > 100000 then
 		weight = 30
-		end
-
-	elseif
-		-- maybe add a function to attack hero with lowest health?
-		local enemyHeroes = HoN.GetHeroes(enemyTeam)
-		if enemyHeroes = 0
-			weight = 30
-			end
-		end
-
-	elseif
-
+	elseif HoN.GetHeroes(enemyTeam) == 0 then
+		weight = 30
+	else
 		-- gets how many enemies are active
 		local enemiesActive = behaviorLib.EnemiesPushUtility(core.enemyTeam)
 		-- gets strength of your team
@@ -169,10 +160,10 @@ function LaneFarmingState.PushingStrengthUtility(myHero)
 		-- weight is balance between enemiesactive, how powerful is your team
 		weight = enemiesActive + pushingUtility + pushingStrUtil + heroPower
 		-- makes sure number is is within cap
-		weight = Clamp(utility, 0, behaviorLib.pushingCap)
-		BotEcho("I'm pushing, yo")
+		weight = core.Clamp(utility, 0, behaviorLib.pushingCap)
+		core.BotEcho("I'm pushing, yo")
 		--any other behavior?
-		end
+	end
 	return weight
 end
 
