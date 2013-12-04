@@ -139,7 +139,7 @@ function LaningState.RetreatFromThreatExecuteOverride(botBrain)
 		if not (core.IsLaneCreep(unitEnemy) and unitEnemyTarget and unitEnemyTarget:GetUniqueID() ~= nMyID) then
 			local nAbsRange = core.GetAbsoluteAttackRangeToUnit(unitEnemy, unitSelf) + 325
 			local nAbsRangeSq = nAbsRange * nAbsRange
-			local nDistSq = Vector3.Distance2DSq(vecSelfPos, unitEnemy:GetPosition())
+			local nDistSq = Vector3.Distance2DSq(unitSelf:GetPosition(), unitEnemy:GetPosition())
 			if nDistSq < nAbsRangeSq then
 				tinsert(tThreateningUnits, unitEnemy)
 				tinsert(tUnitThreatenedRadius, nAbsRange)
@@ -161,11 +161,11 @@ function LaningState.RetreatFromThreatExecuteOverride(botBrain)
 			-- Check if it is safe to drink
 			if vecRetreatDirection then
 				bActionTaken = core.OrderMoveToPosClamp(botBrain, unitSelf, vecSelfPos + vecRetreatDirection * core.moveVecMultiplier, false)
-				return
+				return bActionTaken
 			else
 				bActionTaken = core.OrderItemEntityClamp(botBrain, unitSelf, tEnergizers[1], unitSelf)
 				core.BotEcho("Drinking the energizer")
-				return --I'm not sure if this return is needed
+				return bActionTaken--I'm not sure if this return is needed
 			end
 		end
 
@@ -177,7 +177,7 @@ function LaningState.RetreatFromThreatExecuteOverride(botBrain)
 			core.BotEcho("Puttin on ma boots!")
 			local vecPos = behaviorLib.PositionSelfBackUp()
 			bActionTaken = core.OrderMoveToPosClamp(botBrain, core.unitSelf, vecPos, false)
-			return
+			return bActionTaken
 		end
 	
 	end
@@ -273,7 +273,7 @@ function LaneFarmingState.RetreatFromThreatExecuteOverride(botBrain)
 		if not (core.IsLaneCreep(unitEnemy) and unitEnemyTarget and unitEnemyTarget:GetUniqueID() ~= nMyID) then
 			local nAbsRange = core.GetAbsoluteAttackRangeToUnit(unitEnemy, unitSelf) + 325
 			local nAbsRangeSq = nAbsRange * nAbsRange
-			local nDistSq = Vector3.Distance2DSq(vecSelfPos, unitEnemy:GetPosition())
+			local nDistSq = Vector3.Distance2DSq(unitSelf:GetPosition(), unitEnemy:GetPosition())
 			if nDistSq < nAbsRangeSq then
 				tinsert(tThreateningUnits, unitEnemy)
 				tinsert(tUnitThreatenedRadius, nAbsRange)
@@ -295,11 +295,11 @@ function LaneFarmingState.RetreatFromThreatExecuteOverride(botBrain)
 			-- Check if it is safe to drink
 			if vecRetreatDirection then
 				bActionTaken = core.OrderMoveToPosClamp(botBrain, unitSelf, vecSelfPos + vecRetreatDirection * core.moveVecMultiplier, false)
-				return
+				return bActionTaken
 			else
 				bActionTaken = core.OrderItemEntityClamp(botBrain, unitSelf, tEnergizers[1], unitSelf)
 				core.BotEcho("Drinking the energizer")
-				return --I'm not sure if this return is needed
+				return bActionTaken--I'm not sure if this return is needed
 			end
 		end
 
@@ -311,7 +311,7 @@ function LaneFarmingState.RetreatFromThreatExecuteOverride(botBrain)
 			core.BotEcho("Puttin on ma boots!")
 			local vecPos = behaviorLib.PositionSelfBackUp()
 			bActionTaken = core.OrderMoveToPosClamp(botBrain, core.unitSelf, vecPos, false)
-			return
+			return bActionTaken
 		end
 	
 	end
