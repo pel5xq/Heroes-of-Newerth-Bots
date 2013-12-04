@@ -48,30 +48,52 @@ end
     -- Do nothing. Abstract interface function
       return .5
     end
+    function AggLevel:talk ()
+    -- Do nothing. Abstract interface function
+    end
 
 --Create a class Aggressive which implements AggLevel
     Aggressive = createClass(AggLevel)
     function Aggressive:action ()
     -- Attack nearby enemy
-      return .5
+      return 10
+    end
+
+    function Aggressive:talk ()
+      core.AllChat("I'm Aggressive!")
     end
 
 --Create a class Coward which implements AggLevel
     Coward = createClass(AggLevel)
     function Coward:action ()
     -- Run from nearby enemy
-      return .5
+      return 0
+    end
+
+    function Coward:talk ()
+      core.AllChat("I'm Cowardly!")
     end
 
 --Create a class Oblivious which implements AggLevel
     Oblivious = createClass(AggLevel)
     function Oblivious:action ()
     -- Ignore nearby enemy
-      return .5
+      return 0
     end
-    
-    local actualbehavior = Oblivious:new{}
+
+    function Oblivious:talk ()
+      core.AllChat("I'm Oblivous!")
+    end
+
+
+    --Sets bot's aggression level
+    local actualbehavior = Aggressive:new{}
+    --local actualbehavior = Oblivious:new{}
 
 function aggroBehavior.action() 
    return actualbehavior.action()
+end
+
+function aggroBehavior.talk() 
+   return actualbehavior.talk()
 end
