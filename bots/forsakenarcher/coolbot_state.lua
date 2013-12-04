@@ -11,6 +11,9 @@ runfile "bots/behaviorLib.lua"
 
 local core, eventsLib, behaviorLib, metadata, skills, state = object.core, object.eventsLib, object.behaviorLib, object.metadata, object.skills, object.state
 
+-- tinsert is used in RetreatFromThreatExecuteOverride. This line may not be necessary but just in case
+local tinsert = _G.table.insert
+
 
 local function search (k, plist)
  for i=1, table.getn(plist) do
@@ -120,8 +123,66 @@ function LaningState.PushingStrengthUtility(myHero)
 end
 
 function LaningState.RetreatFromThreatExecuteOverride(botBrain)
-   -- If enough danger, use Energizer or Phase Boots to escape
-   return true
+   -- If enough danger, use Energizer or Phase Boots/Ghost Marchers to escape
+   
+   	local bActionTaken = false
+	local unitSelf = core.unitSelf
+   
+   ---find all the danger in the area
+	local nMyID = unitSelf:GetUniqueID()
+	local tThreateningUnits = {}
+	local tUnitThreatenedRadius = {}
+	
+	for _, unitEnemy in pairs(core.localUnits["EnemyUnits"]) do
+		-- Ignore creeps that are already attacking something
+		local unitEnemyTarget = unitEnemy:GetAttackTarget()
+		if not (core.IsLaneCreep(unitEnemy) and unitEnemyTarget and unitEnemyTarget:GetUniqueID() ~= nMyID) then
+			local nAbsRange = core.GetAbsoluteAttackRangeToUnit(unitEnemy, unitSelf) + 325
+			local nAbsRangeSq = nAbsRange * nAbsRange
+			local nDistSq = Vector3.Distance2DSq(vecSelfPos, unitEnemy:GetPosition())
+			if nDistSq < nAbsRangeSq then
+				tinsert(tThreateningUnits, unitEnemy)
+				tinsert(tUnitThreatenedRadius, nAbsRange)
+			end
+		end
+	end
+	
+	-- determine scale of the threat from enemies or projectiles
+	local nThreateningUnits = core.NumberElements(tThreateningUnits)
+	if nThreateningUnits > 0  or #eventsLib.incomingProjectiles["all"] > 0 then
+		-- determine how we are going to retreat
+		local vecSelfPos = unitSelf:GetPosition()
+		local tInventory = unitSelf:GetInventory()
+		local tEnergizers = core.InventoryContains(tInventory, "Item_Energizer")
+		
+		-- check inventory: do we have an energizer to use?
+		if not core.IsTableEmpty(tEnergizers) then
+			local vecRetreatDirection = behaviorLib.GetSafeDrinkDirection()
+			-- Check if it is safe to drink
+			if vecRetreatDirection then
+				bActionTaken = core.OrderMoveToPosClamp(botBrain, unitSelf, vecSelfPos + vecRetreatDirection * core.moveVecMultiplier, false)
+				return
+			else
+				bActionTaken = core.OrderItemEntityClamp(botBrain, unitSelf, tEnergizers[1], unitSelf)
+				core.BotEcho("Drinking the energizer")
+				return --I'm not sure if this return is needed
+			end
+		end
+
+		--Activate ghost marchers if we can
+		local itemGhostMarchers = core.itemGhostMarchers
+		
+		if behaviorLib.lastRetreatUtil >= behaviorLib.retreatGhostMarchersThreshold and itemGhostMarchers and itemGhostMarchers:CanActivate() then
+			core.OrderItemClamp(botBrain, core.unitSelf, itemGhostMarchers)
+			core.BotEcho("Puttin on ma boots!")
+			local vecPos = behaviorLib.PositionSelfBackUp()
+			bActionTaken = core.OrderMoveToPosClamp(botBrain, core.unitSelf, vecPos, false)
+			return
+		end
+	
+	end
+	
+	return bActionTaken
 end
 
 LaneFarmingState = createClass(ParentState)
@@ -196,8 +257,66 @@ end
 
 
 function LaneFarmingState.RetreatFromThreatExecuteOverride(botBrain)
-   -- If enough danger, use Energizer or Phase Boots to escape
-   return true
+   -- If enough danger, use Energizer or Phase Boots/Ghost Marchers to escape
+   
+   		local bActionTaken = false
+		local unitSelf = core.unitSelf
+   
+   ---find all the danger in the area
+	local nMyID = unitSelf:GetUniqueID()
+	local tThreateningUnits = {}
+	local tUnitThreatenedRadius = {}
+	
+	for _, unitEnemy in pairs(core.localUnits["EnemyUnits"]) do
+		-- Ignore creeps that are already attacking something
+		local unitEnemyTarget = unitEnemy:GetAttackTarget()
+		if not (core.IsLaneCreep(unitEnemy) and unitEnemyTarget and unitEnemyTarget:GetUniqueID() ~= nMyID) then
+			local nAbsRange = core.GetAbsoluteAttackRangeToUnit(unitEnemy, unitSelf) + 325
+			local nAbsRangeSq = nAbsRange * nAbsRange
+			local nDistSq = Vector3.Distance2DSq(vecSelfPos, unitEnemy:GetPosition())
+			if nDistSq < nAbsRangeSq then
+				tinsert(tThreateningUnits, unitEnemy)
+				tinsert(tUnitThreatenedRadius, nAbsRange)
+			end
+		end
+	end
+	
+	-- determine scale of the threat from enemies or projectiles
+	local nThreateningUnits = core.NumberElements(tThreateningUnits)
+	if nThreateningUnits > 0  or #eventsLib.incomingProjectiles["all"] > 0 then
+		-- determine how we are going to retreat
+		local vecSelfPos = unitSelf:GetPosition()
+		local tInventory = unitSelf:GetInventory()
+		local tEnergizers = core.InventoryContains(tInventory, "Item_Energizer")
+		
+		-- check inventory: do we have an energizer to use?
+		if not core.IsTableEmpty(tEnergizers) then
+			local vecRetreatDirection = behaviorLib.GetSafeDrinkDirection()
+			-- Check if it is safe to drink
+			if vecRetreatDirection then
+				bActionTaken = core.OrderMoveToPosClamp(botBrain, unitSelf, vecSelfPos + vecRetreatDirection * core.moveVecMultiplier, false)
+				return
+			else
+				bActionTaken = core.OrderItemEntityClamp(botBrain, unitSelf, tEnergizers[1], unitSelf)
+				core.BotEcho("Drinking the energizer")
+				return --I'm not sure if this return is needed
+			end
+		end
+
+		--Activate ghost marchers if we can
+		local itemGhostMarchers = core.itemGhostMarchers
+		
+		if behaviorLib.lastRetreatUtil >= behaviorLib.retreatGhostMarchersThreshold and itemGhostMarchers and itemGhostMarchers:CanActivate() then
+			core.OrderItemClamp(botBrain, core.unitSelf, itemGhostMarchers)
+			core.BotEcho("Puttin on ma boots!")
+			local vecPos = behaviorLib.PositionSelfBackUp()
+			bActionTaken = core.OrderMoveToPosClamp(botBrain, core.unitSelf, vecPos, false)
+			return
+		end
+	
+	end
+	
+	return bActionTaken
 end
 
 local laningstate = LaningState:new{}
