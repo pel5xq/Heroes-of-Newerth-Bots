@@ -73,7 +73,7 @@ end
     end
 
     function Aggressive:talk ()
-      core.AllChat("I'm Aggressive!")
+      --core.AllChat("I'm Aggressive!")
     end
 
 --Create a class Coward which implements AggLevel
@@ -90,7 +90,7 @@ end
     end
 
     function Coward:talk ()
-      core.AllChat("I'm Cowardly!")
+      --core.AllChat("I'm Cowardly!")
     end
 
 --Create a class Oblivious which implements AggLevel
@@ -107,7 +107,7 @@ end
     end
 
     function Oblivious:talk ()
-      core.AllChat("I'm Oblivious!")
+      --core.AllChat("I'm Oblivious!")
     end
 
 
