@@ -170,10 +170,14 @@ object.oncombatevent     = object.oncombateventOverride
 ------------------------------------------------------
 -- @param: iunitentity hero
 -- @return: number
+
 local function CustomHarassUtilityFnOverride(hero)
-    return state.CustomHarassUtilityFnOverride(hero) * aggroBehavior.action()
+	aggroBehavior.talk()
+	local harassWeight = (state.CustomHarassUtilityFnOverride(hero) * aggroBehavior.action())
+    	return harassWeight
 end
--- assisgn custom Harrass function to the behaviourLib object
+
+-- assign custom Harrass function to the behaviourLib object
 behaviorLib.CustomHarassUtility = CustomHarassUtilityFnOverride   
 
 
