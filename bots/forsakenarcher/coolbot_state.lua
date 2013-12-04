@@ -66,6 +66,7 @@ function LaningState:oncombateventOverride(EventData)
 		local tLocalEnemies = core.CopyTable(core.localUnits["EnemyHeroes"])
 		
 		for nID, unitEnemy in pairs(tLocalEnemies) do
+		   --Attack enemy if they are at less than 60% health
 		   if (unitEnemy:GetHealth() / unitEnemy:GetMaxHealth()) < .6 then unitToAttack = unitEnemy end
 		end
 		
@@ -82,14 +83,35 @@ function LaningState:oncombateventOverride(EventData)
 		    --core.AllChat("Take this!")
 		    core.OrderAbilityPosition(object, core.unitSelf:GetAbility(0), unitToAttack:GetPosition() +  .75 * unitToAttack:GetMoveSpeed() * Vector3.Normalize(unitToAttack.storedPosition - unitToAttack.lastStoredPosition))
 		  end
-		end
+	  end
 	end
 end
 
 function LaningState:CustomHarassUtilityFnOverride(hero)
 		-- attack if enemy is out of position
 		-- and you wouldnt be put out of position by attacking
-		return .5
+
+	local harassWeight = 0
+
+	local self = core.unitSelf
+    	local enemyTarget = behaviorLib.heroTarget
+
+	--Make sure target is valid
+    	if enemyTarget ~= nil then
+
+		local myPosition = self:GetPosition()
+		local enemyPosition = enemyTarget:GetPosition()
+		local distanceToTarget = Vector3.Distance2DSq(myPosition, enemyPosition)
+		local attackRange = core.GetAbsoluteAttackRangeToUnit(self, enemyTarget)
+
+		--Harass enemy unit if they get into auto-attack range
+		if attackRange > distanceToTarget then
+			harassWeight = harassWeight + 50
+			--core.AllChat("Enemy in Range!")
+		end
+	end
+
+	return harassWeight
 end
 
 function LaningState.PushingStrengthUtility(myHero)
@@ -132,7 +154,11 @@ end
 
 function LaneFarmingState:CustomHarassUtilityFnOverride(hero)
 		-- reasses how much you should be farming then
-		return .5
+
+		--Don't harass while farming
+		local harassWeight = 0
+		
+		return harassWeight
 end
 
 function LaneFarmingState.PushingStrengthUtility(myHero)
@@ -218,9 +244,9 @@ function state.CustomHarassUtilityFnOverride(hero)
 end
 
 function state.PushingStrengthUtility(myHero)
-  return actualstate.PushingStrengthUtility(myHero)
+ 	return actualstate.PushingStrengthUtility(myHero)
 end
 
 function state.RetreatFromThreatExecuteOverride(botBrain)
-   return actualstate.RetreatFromThreatExecuteOverride(botBrain)
+   	return actualstate.RetreatFromThreatExecuteOverride(botBrain)
 end
