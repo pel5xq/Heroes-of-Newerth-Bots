@@ -150,24 +150,27 @@ function LaningState.RetreatFromThreatExecuteOverride(botBrain)
 	-- determine scale of the threat from enemies or projectiles
 	local nThreateningUnits = core.NumberElements(tThreateningUnits)
 	if nThreateningUnits > 0  or #eventsLib.incomingProjectiles["all"] > 0 then
+		
+	--	todo: figure out how to use the Energizer
+	
 		-- determine how we are going to retreat
-		local vecSelfPos = unitSelf:GetPosition()
-		local tInventory = unitSelf:GetInventory()
-		local tEnergizers = core.InventoryContains(tInventory, "Item_Energizer")
+	--	local vecSelfPos = unitSelf:GetPosition()
+	--	local tInventory = unitSelf:GetInventory()
+	--	local tEnergizers = core.InventoryContains(tInventory, "Item_Energizer")
 		
 		-- check inventory: do we have an energizer to use?
-		if not core.IsTableEmpty(tEnergizers) then
-			local vecRetreatDirection = behaviorLib.GetSafeDrinkDirection()
+	--	if not core.IsTableEmpty(tEnergizers) then
+	--		local vecRetreatDirection = behaviorLib.GetSafeDrinkDirection()
 			-- Check if it is safe to drink
-			if vecRetreatDirection then
-				bActionTaken = core.OrderMoveToPosClamp(botBrain, unitSelf, vecSelfPos + vecRetreatDirection * core.moveVecMultiplier, false)
-				return bActionTaken
-			else
-				bActionTaken = core.OrderItemEntityClamp(botBrain, unitSelf, tEnergizers[1], unitSelf)
-				core.BotEcho("Drinking the energizer")
-				return bActionTaken--I'm not sure if this return is needed
-			end
-		end
+	--		if vecRetreatDirection then
+	--			bActionTaken = core.OrderMoveToPosClamp(botBrain, unitSelf, vecSelfPos + vecRetreatDirection * core.moveVecMultiplier, false)
+	--			return bActionTaken
+	--		else
+	--			bActionTaken = core.OrderItemEntityClamp(botBrain, unitSelf, tEnergizers[1], unitSelf)
+	--			core.BotEcho("Drinking the energizer")
+	--			return bActionTaken--I'm not sure if this return is needed
+	--		end
+	--	end
 
 		--Activate ghost marchers if we can
 		local itemGhostMarchers = core.itemGhostMarchers
@@ -284,24 +287,26 @@ function LaneFarmingState.RetreatFromThreatExecuteOverride(botBrain)
 	-- determine scale of the threat from enemies or projectiles
 	local nThreateningUnits = core.NumberElements(tThreateningUnits)
 	if nThreateningUnits > 0  or #eventsLib.incomingProjectiles["all"] > 0 then
+		
+	--	todo: figure out how to use the Energizer
 		-- determine how we are going to retreat
-		local vecSelfPos = unitSelf:GetPosition()
-		local tInventory = unitSelf:GetInventory()
-		local tEnergizers = core.InventoryContains(tInventory, "Item_Energizer")
+	--	local vecSelfPos = unitSelf:GetPosition()
+	--	local tInventory = unitSelf:GetInventory()
+	--	local tEnergizers = core.InventoryContains(tInventory, "Item_Energizer")
 		
 		-- check inventory: do we have an energizer to use?
-		if not core.IsTableEmpty(tEnergizers) then
-			local vecRetreatDirection = behaviorLib.GetSafeDrinkDirection()
-			-- Check if it is safe to drink
-			if vecRetreatDirection then
-				bActionTaken = core.OrderMoveToPosClamp(botBrain, unitSelf, vecSelfPos + vecRetreatDirection * core.moveVecMultiplier, false)
-				return bActionTaken
-			else
-				bActionTaken = core.OrderItemEntityClamp(botBrain, unitSelf, tEnergizers[1], unitSelf)
-				core.BotEcho("Drinking the energizer")
-				return bActionTaken--I'm not sure if this return is needed
-			end
-		end
+	--	if not core.IsTableEmpty(tEnergizers) then
+	--		local vecRetreatDirection = behaviorLib.GetSafeDrinkDirection()
+	--		-- Check if it is safe to drink
+	--		if vecRetreatDirection then
+	--			bActionTaken = core.OrderMoveToPosClamp(botBrain, unitSelf, vecSelfPos + vecRetreatDirection * core.moveVecMultiplier, false)
+	--			return bActionTaken
+	--		else
+	--			bActionTaken = core.OrderItemEntityClamp(botBrain, unitSelf, tEnergizers[1], unitSelf)
+	--			core.BotEcho("Drinking the energizer")
+	--			return bActionTaken--I'm not sure if this return is needed
+	--		end
+	--	end
 
 		--Activate ghost marchers if we can
 		local itemGhostMarchers = core.itemGhostMarchers
