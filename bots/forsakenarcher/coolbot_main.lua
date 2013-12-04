@@ -173,7 +173,7 @@ object.oncombatevent     = object.oncombateventOverride
 
 local function CustomHarassUtilityFnOverride(hero)
 	aggroBehavior.talk()
-	local harassWeight = (state.CustomHarassUtilityFnOverride(hero) * aggroBehavior.action())
+	local harassWeight = (state.CustomHarassUtilityFnOverride(hero) * aggroBehavior.attackWeight())
     	return harassWeight
 end
 
@@ -221,7 +221,7 @@ behaviorLib.CustomHarassUtility = CustomHarassUtilityFnOverride
 --behaviorLib.HarassHeroBehavior["Execute"] = HarassHeroExecuteOverride
 
 local function PushingStrengthUtilityOverride(myHero)
-        return  object.funcPushUtilityOld(myHero) * state.PushingStrengthUtility(myHero) * aggroBehavior.action()
+        return  object.funcPushUtilityOld(myHero) * state.PushingStrengthUtility(myHero) * aggroBehavior.attackWeight()
 end
 object.funcPushUtilityOld = behaviorLib.PushingStrengthUtility
 behaviorLib.PushingStrengthUtility = PushingStrengthUtilityOverride

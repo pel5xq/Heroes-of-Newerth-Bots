@@ -44,19 +44,32 @@ end
 
 -- Creates a class called AggLevel
     AggLevel = {}
-    function AggLevel:action ()
+
+    function AggLevel:attackWeight ()
     -- Do nothing. Abstract interface function
       return .5
     end
+
+    function AggLevel:retreatWeight ()
+    -- Do nothing. Abstract interface function
+      return .5
+    end
+
     function AggLevel:talk ()
     -- Do nothing. Abstract interface function
     end
 
 --Create a class Aggressive which implements AggLevel
     Aggressive = createClass(AggLevel)
-    function Aggressive:action ()
+
+    function Aggressive:attackWeight ()
     -- Attack nearby enemy
       return 10
+    end
+
+    function Aggressive:retreatWeight ()
+    -- Rarely retreat
+      return .2
     end
 
     function Aggressive:talk ()
@@ -65,9 +78,15 @@ end
 
 --Create a class Coward which implements AggLevel
     Coward = createClass(AggLevel)
-    function Coward:action ()
-    -- Run from nearby enemy
+
+    function Coward:attackWeight ()
+    -- Don't attack nearby enemy
       return 0
+    end
+
+    function Coward:retreatWeight ()
+    -- Run from nearby enemy
+      return 10
     end
 
     function Coward:talk ()
@@ -76,22 +95,32 @@ end
 
 --Create a class Oblivious which implements AggLevel
     Oblivious = createClass(AggLevel)
-    function Oblivious:action ()
+
+    function Oblivious:attackWeight ()
+    -- Ignore nearby enemy
+      return 0
+    end
+
+    function Oblivious:retreatWeight ()
     -- Ignore nearby enemy
       return 0
     end
 
     function Oblivious:talk ()
-      core.AllChat("I'm Oblivous!")
+      core.AllChat("I'm Oblivious!")
     end
 
 
-    --Sets bot's aggression level
-    local actualbehavior = Aggressive:new{}
-    --local actualbehavior = Oblivious:new{}
+--Sets bot's aggression level
+	local actualbehavior = Aggressive:new{}
+	--local actualbehavior = Oblivious:new{}
 
-function aggroBehavior.action() 
-   return actualbehavior.action()
+function aggroBehavior.attackWeight() 
+   return actualbehavior.attackWeight()
+end
+
+function aggroBehavior.retreatWeight() 
+   return actualbehavior.retreatWeight()
 end
 
 function aggroBehavior.talk() 
