@@ -82,7 +82,6 @@ function LaningState:oncombateventOverride(EventData)
 		  --else use crippling volley
 		  elseif core.unitSelf:GetAbility(0):CanActivate() then
 		    --cast it a little ahead of where target is pointing
-		    --if botBrain == nil then core.AllChat("Null bot brain") end
 		    --core.AllChat("Take this!")
 		    core.OrderAbilityPosition(object, core.unitSelf:GetAbility(0), unitToAttack:GetPosition() +  .75 * unitToAttack:GetMoveSpeed() * Vector3.Normalize(unitToAttack.storedPosition - unitToAttack.lastStoredPosition))
 		  end
@@ -172,27 +171,6 @@ function LaningState.RetreatFromThreatExecuteOverride(botBrain)
 	local nThreateningUnits = core.NumberElements(tThreateningUnits)
 	if nThreateningUnits > 0  or #eventsLib.incomingProjectiles["all"] > 0 then
 
-	--	todo: figure out how to use the Energizer
-
-		-- determine how we are going to retreat
-	--	local vecSelfPos = unitSelf:GetPosition()
-	--	local tInventory = unitSelf:GetInventory()
-	--	local tEnergizers = core.InventoryContains(tInventory, "Item_Energizer")
-
-		-- check inventory: do we have an energizer to use?
-	--	if not core.IsTableEmpty(tEnergizers) then
-	--		local vecRetreatDirection = behaviorLib.GetSafeDrinkDirection()
-			-- Check if it is safe to drink
-	--		if vecRetreatDirection then
-	--			bActionTaken = core.OrderMoveToPosClamp(botBrain, unitSelf, vecSelfPos + vecRetreatDirection * core.moveVecMultiplier, false)
-	--			return bActionTaken
-	--		else
-	--			bActionTaken = core.OrderItemEntityClamp(botBrain, unitSelf, tEnergizers[1], unitSelf)
-	--			core.BotEcho("Drinking the energizer")
-	--			return bActionTaken--I'm not sure if this return is needed
-	--		end
-	--	end
-
 		--Activate ghost marchers if we can
 		local itemGhostMarchers = core.itemGhostMarchers
 
@@ -238,9 +216,7 @@ function LaneFarmingState:oncombateventOverride(EventData)
 end
 
 function LaneFarmingState:CustomHarassUtilityFnOverride(hero)
-		-- reasses how much you should be farming then
-
-		--Don't harass while farming
+	--Don't harass while farming
 		local harassWeight = 0
 
 		return harassWeight
@@ -308,26 +284,6 @@ function LaneFarmingState.RetreatFromThreatExecuteOverride(botBrain)
 	-- determine scale of the threat from enemies or projectiles
 	local nThreateningUnits = core.NumberElements(tThreateningUnits)
 	if nThreateningUnits > 0  or #eventsLib.incomingProjectiles["all"] > 0 then
-
-	--	todo: figure out how to use the Energizer
-		-- determine how we are going to retreat
-	--	local vecSelfPos = unitSelf:GetPosition()
-	--	local tInventory = unitSelf:GetInventory()
-	--	local tEnergizers = core.InventoryContains(tInventory, "Item_Energizer")
-
-		-- check inventory: do we have an energizer to use?
-	--	if not core.IsTableEmpty(tEnergizers) then
-	--		local vecRetreatDirection = behaviorLib.GetSafeDrinkDirection()
-	--		-- Check if it is safe to drink
-	--		if vecRetreatDirection then
-	--			bActionTaken = core.OrderMoveToPosClamp(botBrain, unitSelf, vecSelfPos + vecRetreatDirection * core.moveVecMultiplier, false)
-	--			return bActionTaken
-	--		else
-	--			bActionTaken = core.OrderItemEntityClamp(botBrain, unitSelf, tEnergizers[1], unitSelf)
-	--			core.BotEcho("Drinking the energizer")
-	--			return bActionTaken--I'm not sure if this return is needed
-	--		end
-	--	end
 
 		--Activate ghost marchers if we can
 		local itemGhostMarchers = core.itemGhostMarchers

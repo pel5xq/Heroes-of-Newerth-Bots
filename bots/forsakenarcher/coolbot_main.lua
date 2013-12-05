@@ -180,46 +180,6 @@ end
 -- assign custom Harrass function to the behaviourLib object
 behaviorLib.CustomHarassUtility = CustomHarassUtilityFnOverride   
 
-
-
-
---------------------------------------------------------------
---                    Harass Behavior                       --
--- All code how to use abilities against enemies goes here  --
---------------------------------------------------------------
--- @param botBrain: CBotBrain
--- @return: none
---
---local function HarassHeroExecuteOverride(botBrain)
-    
---    local unitTarget = behaviorLib.heroTarget
---    if unitTarget == nil then
---        return object.harassExecuteOld(botBrain) --Target is invalid, move on to the next behavior
---    end
-    
-    
---    local unitSelf = core.unitSelf
---    local vecMyPosition = unitSelf:GetPosition() 
---    local nAttackRange = core.GetAbsoluteAttackRangeToUnit(unitSelf, unitTarget)
---    local nMyExtraRange = core.GetExtraRange(unitSelf)
-    
---    local vecTargetPosition = unitTarget:GetPosition()
---    local nTargetExtraRange = core.GetExtraRange(unitTarget)
---    local nTargetDistanceSq = Vector3.Distance2DSq(vecMyPosition, vecTargetPosition)
-    
---    local nLastHarassUtility = behaviorLib.lastHarassUtil
---    local bCanSee = core.CanSeeUnit(botBrain, unitTarget)    
-    --if botBrain == nil then core.AllChat("Null bot brain in main") end
---    local bActionTaken = state.HarassHeroExecuteOverride(botBrain)
---   
---    if not bActionTaken then
---        return object.harassExecuteOld(botBrain)
---    end 
---end
--- overload the behaviour stock function with custom 
---object.harassExecuteOld = behaviorLib.HarassHeroBehavior["Execute"]
---behaviorLib.HarassHeroBehavior["Execute"] = HarassHeroExecuteOverride
-
 local function PushingStrengthUtilityOverride(myHero)
         return  object.funcPushUtilityOld(myHero) * state.PushingStrengthUtility(myHero) * aggroBehavior.attackWeight()
 end
@@ -234,5 +194,3 @@ function behaviorLib.RetreatFromThreatExecuteOverride(botBrain)
 end
 behaviorLib.RetreatFromThreatExecuteOld = behaviorLib.RetreatFromThreatBehavior["Execute"]
 behaviorLib.RetreatFromThreatBehavior["Execute"] = behaviorLib.RetreatFromThreatExecuteOverride
-
-
