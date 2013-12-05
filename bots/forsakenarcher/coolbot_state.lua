@@ -119,26 +119,28 @@ end
 
 function LaningState.PushingStrengthUtility(myHero)
   -- if late enough into the game, push, otherwise refrain
-	local gameTime = HoN.getGameTime()
-	-- these parameters can be used if we want to make the behavior more complex
-	local myPosition = unitSelf:GetPosition()
-	local unitTarget = nil
-	myPosition, unitTarget = behaviorLib.PositionSelfLogic(botBrain)
-	local weight = 0
-	if gameTime > 10000 then
-		if core.NumberElements(tLocalUnits["EnemyHeroes"]) = 0 then
-			weight = 30
-		end
-		elseif core.NumberElements(tLocalUnits["EnemyHeroes"]) = 1 then
-			weight = 20
-		end
-		elseif core.NumberElements(tLocalUnits["EnemyHeroes"]) > 1) then
-			weight = 10
+	if HoN ~= nil then
+		local gameTime = HoN.GetGameTime()
+		-- these parameters can be used if we want to make the behavior more complex
+		--local myPosition = unitSelf:GetPosition()
+		--local unitTarget = nil
+		--myPosition, unitTarget = behaviorLib.PositionSelfLogic(botBrain)
+		local tLocalUnits = core.localUnits
+		local weight = 0
+		if gameTime > 10000 then
+			if core.NumberElements(tLocalUnits["EnemyHeroes"]) == 0 then
+				weight = 30
+			elseif core.NumberElements(tLocalUnits["EnemyHeroes"]) == 1 then
+				weight = 20
+			elseif core.NumberElements(tLocalUnits["EnemyHeroes"]) > 1 then
+				weight = 10
+			end
+
 		end
 
-	end
-
-  return weight
+  		return weight
+  	end
+  return .5
 end
 
 function LaningState.RetreatFromThreatExecuteOverride(botBrain)
