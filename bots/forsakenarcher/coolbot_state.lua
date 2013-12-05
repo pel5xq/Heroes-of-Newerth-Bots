@@ -24,23 +24,23 @@ end
 
     function createClass (...)
       local c = {}        -- new class
-    
+
       -- class will search for each method in the list of its
       -- parents (`arg' is the list of parents)
       setmetatable(c, {__index = function (t, k)
         return search(k, arg)
       end})
-    
+
       -- prepare `c' to be the metatable of its instances
       c.__index = c
-    
+
       -- define a new constructor for this new class
       function c:new (o)
         o = o or {}
         setmetatable(o, c)
         return o
       end
-    
+
       -- return new class
       return c
     end
@@ -67,18 +67,18 @@ function LaningState:oncombateventOverride(EventData)
 	if core.unitSelf ~= nil then
 		local unitToAttack
 		local tLocalEnemies = core.CopyTable(core.localUnits["EnemyHeroes"])
-		
+
 		for nID, unitEnemy in pairs(tLocalEnemies) do
 		   --Attack enemy if they are at less than 60% health
 		   if (unitEnemy:GetHealth() / unitEnemy:GetMaxHealth()) < .6 then unitToAttack = unitEnemy end
 		end
-		
-		if unitToAttack ~= nil then 
+
+		if unitToAttack ~= nil then
 		  --if already immobilized from crippling volley, use ultimate
 		  if (unitToAttack:IsStunned() or unitToAttack:IsImmobilized()) and core.unitSelf:GetAbility(3):CanActivate() then
 		    --core.AllChat("Ultimate time!")
 		    core.OrderAbilityPosition(object, core.unitSelf:GetAbility(3), unitToAttack:GetPosition())
-		  
+
 		  --else use crippling volley
 		  elseif core.unitSelf:GetAbility(0):CanActivate() then
 		    --cast it a little ahead of where target is pointing
@@ -119,20 +119,39 @@ end
 
 function LaningState.PushingStrengthUtility(myHero)
   -- if late enough into the game, push, otherwise refrain
-  return .5
+	local gameTime = HoN.getGameTime()
+	-- these parameters can be used if we want to make the behavior more complex
+	local myPosition = unitSelf:GetPosition()
+	local unitTarget = nil
+	myPosition, unitTarget = behaviorLib.PositionSelfLogic(botBrain)
+	local weight = 0
+	if gameTime > 10000 then
+		if core.NumberElements(tLocalUnits["EnemyHeroes"]) = 0 then
+			weight = 30
+		end
+		elseif core.NumberElements(tLocalUnits["EnemyHeroes"]) = 1 then
+			weight = 20
+		end
+		elseif core.NumberElements(tLocalUnits["EnemyHeroes"]) > 1) then
+			weight = 10
+		end
+
+	end
+
+  return weight
 end
 
 function LaningState.RetreatFromThreatExecuteOverride(botBrain)
    -- If enough danger, use Energizer or Phase Boots/Ghost Marchers to escape
-   
+
    	local bActionTaken = false
 	local unitSelf = core.unitSelf
-   
+
    ---find all the danger in the area
 	local nMyID = unitSelf:GetUniqueID()
 	local tThreateningUnits = {}
 	local tUnitThreatenedRadius = {}
-	
+
 	for _, unitEnemy in pairs(core.localUnits["EnemyUnits"]) do
 		-- Ignore creeps that are already attacking something
 		local unitEnemyTarget = unitEnemy:GetAttackTarget()
@@ -146,18 +165,18 @@ function LaningState.RetreatFromThreatExecuteOverride(botBrain)
 			end
 		end
 	end
-	
+
 	-- determine scale of the threat from enemies or projectiles
 	local nThreateningUnits = core.NumberElements(tThreateningUnits)
 	if nThreateningUnits > 0  or #eventsLib.incomingProjectiles["all"] > 0 then
-		
+
 	--	todo: figure out how to use the Energizer
-	
+
 		-- determine how we are going to retreat
 	--	local vecSelfPos = unitSelf:GetPosition()
 	--	local tInventory = unitSelf:GetInventory()
 	--	local tEnergizers = core.InventoryContains(tInventory, "Item_Energizer")
-		
+
 		-- check inventory: do we have an energizer to use?
 	--	if not core.IsTableEmpty(tEnergizers) then
 	--		local vecRetreatDirection = behaviorLib.GetSafeDrinkDirection()
@@ -174,7 +193,7 @@ function LaningState.RetreatFromThreatExecuteOverride(botBrain)
 
 		--Activate ghost marchers if we can
 		local itemGhostMarchers = core.itemGhostMarchers
-		
+
 		if behaviorLib.lastRetreatUtil >= behaviorLib.retreatGhostMarchersThreshold and itemGhostMarchers and itemGhostMarchers:CanActivate() then
 			core.OrderItemClamp(botBrain, core.unitSelf, itemGhostMarchers)
 			core.BotEcho("Puttin on ma boots!")
@@ -182,9 +201,9 @@ function LaningState.RetreatFromThreatExecuteOverride(botBrain)
 			bActionTaken = core.OrderMoveToPosClamp(botBrain, core.unitSelf, vecPos, false)
 			return bActionTaken
 		end
-	
+
 	end
-	
+
 	return bActionTaken
 end
 
@@ -203,12 +222,12 @@ function LaneFarmingState:oncombateventOverride(EventData)
 		local volleyAbility = core.unitSelf:GetAbility(0)
 		for nID, unitEnemy in pairs(tLocalEnemies) do
 		   numTotal = numTotal + 1
-		   if unitEnemy:GetHealth() < .9 * (85 + 65 * volleyAbility:GetLevel()) then 
-		      numLowEnough = numLowEnough + 1 
+		   if unitEnemy:GetHealth() < .9 * (85 + 65 * volleyAbility:GetLevel()) then
+		      numLowEnough = numLowEnough + 1
 		      averageCreepPosition = unitEnemy:GetPosition()
 		   	elseif highHealthCreep ~= nil then highHealthCreep = unitEnemy end
 		end
-		if numLowEnough > 2 and (numLowEnough / numTotal) > .6 and core.unitSelf:GetMana() > volleyAbility:GetManaCost() * 1.9 then 
+		if numLowEnough > 2 and (numLowEnough / numTotal) > .6 and core.unitSelf:GetMana() > volleyAbility:GetManaCost() * 1.9 then
 		   core.OrderAbilityPosition(object, core.unitSelf:GetAbility(0), averageCreepPosition)
 		elseif highHealthCreep ~= nil then
 		   core.OrderAttackClamp(object, core.unitSelf, highHealthCreep)
@@ -221,7 +240,7 @@ function LaneFarmingState:CustomHarassUtilityFnOverride(hero)
 
 		--Don't harass while farming
 		local harassWeight = 0
-		
+
 		return harassWeight
 end
 
@@ -261,15 +280,15 @@ end
 
 function LaneFarmingState.RetreatFromThreatExecuteOverride(botBrain)
    -- If enough danger, use Energizer or Phase Boots/Ghost Marchers to escape
-   
+
    		local bActionTaken = false
 		local unitSelf = core.unitSelf
-   
+
    ---find all the danger in the area
 	local nMyID = unitSelf:GetUniqueID()
 	local tThreateningUnits = {}
 	local tUnitThreatenedRadius = {}
-	
+
 	for _, unitEnemy in pairs(core.localUnits["EnemyUnits"]) do
 		-- Ignore creeps that are already attacking something
 		local unitEnemyTarget = unitEnemy:GetAttackTarget()
@@ -283,17 +302,17 @@ function LaneFarmingState.RetreatFromThreatExecuteOverride(botBrain)
 			end
 		end
 	end
-	
+
 	-- determine scale of the threat from enemies or projectiles
 	local nThreateningUnits = core.NumberElements(tThreateningUnits)
 	if nThreateningUnits > 0  or #eventsLib.incomingProjectiles["all"] > 0 then
-		
+
 	--	todo: figure out how to use the Energizer
 		-- determine how we are going to retreat
 	--	local vecSelfPos = unitSelf:GetPosition()
 	--	local tInventory = unitSelf:GetInventory()
 	--	local tEnergizers = core.InventoryContains(tInventory, "Item_Energizer")
-		
+
 		-- check inventory: do we have an energizer to use?
 	--	if not core.IsTableEmpty(tEnergizers) then
 	--		local vecRetreatDirection = behaviorLib.GetSafeDrinkDirection()
@@ -310,7 +329,7 @@ function LaneFarmingState.RetreatFromThreatExecuteOverride(botBrain)
 
 		--Activate ghost marchers if we can
 		local itemGhostMarchers = core.itemGhostMarchers
-		
+
 		if behaviorLib.lastRetreatUtil >= behaviorLib.retreatGhostMarchersThreshold and itemGhostMarchers and itemGhostMarchers:CanActivate() then
 			core.OrderItemClamp(botBrain, core.unitSelf, itemGhostMarchers)
 			core.BotEcho("Puttin on ma boots!")
@@ -318,9 +337,9 @@ function LaneFarmingState.RetreatFromThreatExecuteOverride(botBrain)
 			bActionTaken = core.OrderMoveToPosClamp(botBrain, core.unitSelf, vecPos, false)
 			return bActionTaken
 		end
-	
+
 	end
-	
+
 	return bActionTaken
 end
 
@@ -333,30 +352,30 @@ function state.handleStateChange()
    -- if no enemies are in lane
    -- and there is no apparent danger of heroes coming
    -- and >= lvl 4, switch to lane farming
-   
+
    --Dont go back to farming if saw an enemy as recently
    --as 30 seconds ago
-   
+
    -- if enemies do come into
    -- the lane or there is a hero
-   -- missing who could gank, 
+   -- missing who could gank,
    -- switch to laning
-   
+
    if core.unitSelf ~= nil and core.unitSelf:GetLevel() > 3 then
-      local flag = false   
+      local flag = false
       for i,v in pairs(core.localUnits["EnemyHeroes"]) do
          flag = true
       end
-      if (flag and actualstate == lanefarmingstate) then 
+      if (flag and actualstate == lanefarmingstate) then
          core.AllChat("Switching to Laning", 0)
-         actualstate = laningstate 
+         actualstate = laningstate
          lastLaneApp = HoN.GetGameTime()
-      elseif ((not flag) and actualstate == laningstate and (lastLaneApp == 0 or (HoN.GetGameTime() - lastLaneApp) > 1000*30)) then 
-         core.AllChat("Switching to Lane Farming", 0) 
+      elseif ((not flag) and actualstate == laningstate and (lastLaneApp == 0 or (HoN.GetGameTime() - lastLaneApp) > 1000*30)) then
+         core.AllChat("Switching to Lane Farming", 0)
          actualstate = lanefarmingstate
       end
    end
-   
+
 end
 
 function state.oncombateventOverride(EventData)
